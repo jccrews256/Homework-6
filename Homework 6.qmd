@@ -1,0 +1,283 @@
+---
+title: "Homework 6"
+author: "Cass Crews"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+# Task 1: Conceptual Questions
+
+1. What is the purpose of the `lapply()` function? What is the equivalent `purrr` function?
+  - The purpose of `lapply()` is to easily apply a function to each element of a list. The equivalent `purrr` function is `map()`. 
+2. Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use `lapply()` to run the code `cor(numeric_matrix, method = "kendall")` on each element of the list. Write code to do this below! 
+  - `lapply(X=my_list,FUN=cor,method="kendall")`
+3. What are two advantages of using `purrr` functions instead of the `BaseR` apply family?
+  1. There are several associated helper functions and some convenient shorthand functionality.
+  2. There is more consistency across `purrr` functions in terms of argument naming schemes, etc. 
+4. What is a side-effect function?
+  - A side-effect function is a function where the main purpose is not to modify objects in the environment, but rather to output other things like data files, text, and plots. Examples are `plot()` and `write_csv`. 
+5. Why can you name a variable `sd` in a function and not cause any issues with the `sd` function?
+ - Because `R` creates temporary function environment while the function is running, preventing any action within the function environment from overwriting anything outside that environment. The exception is, of course, the object assigned the function output. 
+ 
+ 
+# Task 2: Writing R Functions
+
+Let's build some functions to calculate standard measures of prediction accuracy!
+
+### 1. 
+
+To start, we will create the function `getRMSE()` to calculate the root mean square error (RMSE), or the square root of the average squared difference between a model's predictions and the actual values of the response variable. 
+
+```{r}
+#Writing a function to calculate root mean square error for model predictions
+getRMSE<-function(resp,pred,...) {
+  #Checking validity of pred and resp inputs
+  if (!is.atomic(pred) | !is.numeric(pred)) stop("pred must be a numeric vector")
+  if (!is.atomic(resp) | !is.numeric(resp)) stop("resp must be a numeric vector") 
+  
+  #Calculating the squared differences between predictions and true values
+  squared_diffs<-(resp-pred)^2
+  
+  RMSE<-sqrt(mean(squared_diffs,...))
+  
+  return(list("RMSE"=RMSE))
+}
+```
+
+
+### 2.
+
+Now let's test our function by running a regression on some similated data and passing the response values and predictions to `getRMSE()`. We will start by generating our data.
+
+```{r}
+#Setting seed for reproducibility
+set.seed(10)
+
+#Generating 100 simulated x and resp values
+n <- 100
+x <- runif(n)
+resp <- 3 + 10 * x + rnorm(n)
+
+#Generating predictions from regressing resp on x
+pred <- predict(lm(resp ~ x), data.frame(x))
+```
+
+Now that we have our data, let's apply our `getRMSE()` function.
+
+```{r}
+#Generating RMSE for simulated data
+getRMSE(resp=resp,pred=pred)
+```
+
+As a final check, we will see how our function handles missing values when we include `na.rm=TRUE` and when we do not. 
+
+```{r}
+#Converting the 12th and 48th response values to missing
+resp_nas<-resp
+resp_nas[c(12,48)]<-NA_real_
+
+#Testing getRMSE function with na.rm=TRUE
+getRMSE(resp=resp_nas,pred=pred,na.rm=TRUE)
+
+#Testing function without na.rm=TRUE
+getRMSE(resp=resp_nas,pred=pred)
+```
+
+Interesting! Note that our function overcomes the missing values and works as intended when we specify `na.rm=TRUE`; it calculates the RMSE for the observations where the response is not missing. However, when we don't include this specification, our function returns `NA`. 
+
+
+### 3.
+
+Now we will create the `getMAE()` function to calculate the mean absolute error (MAE), or the average absolute difference between response values and their predictions. 
+
+```{r}
+#Writing a function to calculate mean absolute error for model predictions
+getMAE<-function(resp,pred,...) {
+  #Checking validity of pred and resp inputs
+  if (!is.atomic(pred) | !is.numeric(pred)) stop("pred must be a numeric vector")
+  if (!is.atomic(resp) | !is.numeric(resp)) stop("resp must be a numeric vector") 
+  
+  #Calculating the absolute differences between predictions and true values
+  abs_diffs<-abs(resp-pred)
+  
+  MAE<-mean(abs_diffs,...)
+  
+  return(list("MAE"=MAE))
+}
+```
+
+
+### 4. 
+
+Let's use our simulated data to test the `getMAE()` function.
+
+```{r}
+#Generating MAE for simulated data
+getMAE(resp=resp,pred=pred)
+```
+
+Let's see what happens when our data include `NA`s. As we did for problem 2, we will see what happens when we do and do not specify `na.rm=TRUE`. 
+
+```{r}
+#Testing getMAE function with na.rm=TRUE
+getMAE(resp=resp_nas,pred=pred,na.rm=TRUE)
+
+#Testing function without na.rm=TRUE
+getMAE(resp=resp_nas,pred=pred)
+```
+
+As was the case for `getRMSE()`, when we include `na.rm=TRUE`, the function works as intended and calculates the MAE for the observations where the response is not missing. Meanwhile, when we do not include this additional specification, our function cannot overcome the missing values and returns `NA`. 
+
+
+### 5.
+
+Let's build a wrapper function that calls either or both of our functions above. We will call this function `get_pred_stat`. By default, the function will return both the RMSE and MAE. 
+
+```{r}
+#Creating a wrapper function for getRMSE and getMAE
+get_pred_stats<-function(resp,pred,stats=c("RMSE","MAE"),...) {
+  #Initially creating a list to return
+  return_list<-list()
+  
+  #Running getRMSE if RMSE is requested
+  if ("RMSE" %in% stats) {
+    return_list$RMSE<-unlist(getRMSE(resp=resp,pred=pred,...))
+  }
+  
+  #Running getMAE if MAE is requested
+  if ("MAE" %in% stats) {
+    return_list$MAE<-unlist(getMAE(resp=resp,pred=pred,...))
+  }
+  
+  #Returning requested model prediction stats
+  return(return_list)
+}
+```
+
+
+To test this function, let's first request the RMSE for our response and prediction values created in problem 2. 
+
+```{r}
+#Requesting RMSE using get_pred_stats
+get_pred_stats(resp=resp,pred=pred,stats="RMSE")
+```
+
+Great, the results are the same as in problem 2! 
+
+Next, let's request the MAE for the same response and prediction values. 
+
+```{r}
+#Requesting MAE using get_pred_stats
+get_pred_stats(resp=resp,pred=pred,stats="MAE")
+```
+
+We got exactly what we wanted, as the results were the same as in problem 4. 
+
+Let's confirm that when we don't specify a stat, we receive both RMSE and MAE. 
+
+```{r}
+#Testing function using default stats (both RMSE and MAE)
+get_pred_stats(resp=resp,pred=pred)
+```
+
+Excellent, the function does indeed return both statistics. 
+
+
+Now, let's see what happens when we use the modified response vector that includes two `Na`s. As we did above, we will separately run the function with and without `na.rm=TRUE` specified. 
+
+```{r}
+#Testing NA handling when na.rm=TRUE specified
+get_pred_stats(resp=resp_nas,pred=pred,na.rm=TRUE)
+
+#Testing NA handling when na.rm=TRUE not specified
+get_pred_stats(resp=resp_nas,pred=pred)
+```
+
+As was the case for our individual `getRMSE` and `getMAE` functions when we specify `na.rm=TRUE`, the function excludes the observations with missing values and calculates the RMSE and MAE. When we do not specify `na.rm=TRUE`, `NA`s are returned, which matches the behavior of the individual functions. 
+
+As a final set of checks, we will test the function when incorrect data are specified. First, let's feed a character vector for `pred`. 
+
+```{r}
+#Testing the function with a character vector passed for pred
+get_pred_stats(resp=resp,pred=as.character(pred))
+```
+
+This is exactly what we wanted to happen; the function returns an error and informs us that `pred` must be a numeric vector. 
+
+Now, let's feed a data frame for `resp` and see what the function returns. 
+
+```{r}
+#Testing the function with a data frame passed for resp
+get_pred_stats(resp=data.frame(resp,resp),pred=pred)
+```
+
+Again, the function performed as we wanted it to, indicating that `resp` must also be a numeric vector. 
+
+
+# Task 3: Practice with `purrr`
+
+For the third task, let's explore some `purrr` functions. 
+
+### 1. 
+
+To begin, we will compare the following methods for extracting `coefficients` from a regression output:
+
+- The `$` operator
+- `coef()`
+- `pluck()` from `purrr`
+
+```{r}
+#Capturing an example regression fit
+lm_fit1 <- lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
+
+#Using $ to extract coefficients
+lm_fit1$coefficients
+
+#Using coef to extract coefficients
+coef(lm_fit1)
+
+#Using pluck to extract coefficients
+lm_fit1 |> pluck(coefficients)
+```
+
+The results are identical; each method returns the same named vector of coefficients. 
+
+
+### 2. 
+
+Let's extend the use of `pluck()` across multiple regression fits to really see what `purrr` can do. To do this, we will fit three additional models and combine the four regression outputs in a single list.
+
+```{r}
+#Fitting three additional example models
+lm_fit2 <- lm(Sepal.Length ~ Sepal.Width, data = iris)
+lm_fit3 <- lm(Sepal.Length ~ Petal.Width + Sepal.Width + Species, data = iris)
+lm_fit4 <- lm(Sepal.Length ~ Petal.Width + Petal.Length + Sepal.Width + Species,
+data = iris)
+
+#Combining regression outputs in a single list
+fits <- list(lm_fit1, lm_fit2, lm_fit3, lm_fit4)
+
+#Extracting the coefficients for each model fit
+fits |> 
+  map(pluck,coefficients)
+```
+
+That was easy enough, and we can now compare coefficients across the four models. 
+
+
+### 3. 
+
+It could be useful to have confidence intervals for each coefficient above, so let's use `map()` in combination with `confint()` to obtain those. 
+
+```{r}
+#Extracting confidence intervals for the coefficients from each model fit
+fits |>
+  map(confint)
+```
+
+Again, that was incredibly easy, and now we can identify the coefficients in each model that are statistically different from 0. 

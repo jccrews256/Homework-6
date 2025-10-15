@@ -174,6 +174,8 @@ get_pred_stats<-function(resp,pred,stats=c("RMSE","MAE"),...) {
 ```
 
 
+### 6.
+
 To test this function, let's first request the RMSE for our response and prediction values created in problem 2. 
 
 ```{r}

@@ -348,6 +348,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(return_list)</span>
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="section-5" class="level3">
+<h3 class="anchored" data-anchor-id="section-5">6.</h3>
 <p>To test this function, let’s first request the RMSE for our response and prediction values created in problem 2.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Requesting RMSE using get_pred_stats</span></span>
@@ -434,8 +437,8 @@ MAE
 <section id="task-3-practice-with-purrr" class="level1">
 <h1>Task 3: Practice with <code>purrr</code></h1>
 <p>For the third task, let’s explore some <code>purrr</code> functions.</p>
-<section id="section-5" class="level3">
-<h3 class="anchored" data-anchor-id="section-5">1.</h3>
+<section id="section-6" class="level3">
+<h3 class="anchored" data-anchor-id="section-6">1.</h3>
 <p>To begin, we will compare the following methods for extracting <code>coefficients</code> from a regression output:</p>
 <ul>
 <li>The <code>$</code> operator</li>
@@ -467,8 +470,8 @@ MAE
 </div>
 <p>The results are identical; each method returns the same named vector of coefficients.</p>
 </section>
-<section id="section-6" class="level3">
-<h3 class="anchored" data-anchor-id="section-6">2.</h3>
+<section id="section-7" class="level3">
+<h3 class="anchored" data-anchor-id="section-7">2.</h3>
 <p>Let’s extend the use of <code>pluck()</code> across multiple regression fits to really see what <code>purrr</code> can do. To do this, we will fit three additional models and combine the four regression outputs in a single list.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Fitting three additional example models</span></span>
@@ -507,8 +510,8 @@ Speciesversicolor  Speciesvirginica
 </div>
 <p>That was easy enough, and we can now compare coefficients across the four models.</p>
 </section>
-<section id="section-7" class="level3">
-<h3 class="anchored" data-anchor-id="section-7">3.</h3>
+<section id="section-8" class="level3">
+<h3 class="anchored" data-anchor-id="section-8">3.</h3>
 <p>It could be useful to have confidence intervals for each coefficient above, so let’s use <code>map()</code> in combination with <code>confint()</code> to obtain those.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Extracting confidence intervals for the coefficients from each model fit</span></span>
@@ -547,8 +550,8 @@ Speciesvirginica  -1.6831329 -0.36386273</code></pre>
 </div>
 <p>Again, that was incredibly easy, and now we can identify the coefficients in each model that are statistically different from 0.</p>
 </section>
-<section id="section-8" class="level3">
-<h3 class="anchored" data-anchor-id="section-8">4.</h3>
+<section id="section-9" class="level3">
+<h3 class="anchored" data-anchor-id="section-9">4.</h3>
 <p>Let’s plot the residuals for each fit to visualize in-sample prediction error. To start, we will utilize the <code>map</code> function to capture the residuals for each fit and the <code>walk</code> function to generate a histogram for each fit.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying a 2x2 grid of histograms</span></span>
@@ -568,8 +571,8 @@ Speciesvirginica  -1.6831329 -0.36386273</code></pre>
 </div>
 <p>That wasn’t too hard, but the titles are not informative.</p>
 </section>
-<section id="section-9" class="level3">
-<h3 class="anchored" data-anchor-id="section-9">5.</h3>
+<section id="section-10" class="level3">
+<h3 class="anchored" data-anchor-id="section-10">5.</h3>
 <p>Let’s give names to the elements of the residuals list to see if that fixes the issue.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying a 2x2 grid of histograms</span></span>

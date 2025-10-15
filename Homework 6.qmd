@@ -5,6 +5,8 @@ format: html
 editor: visual
 ---
 
+Before we get started, we need to read in the core `tidyverse` packages.
+
 ```{r}
 library(tidyverse)
 ```
@@ -13,16 +15,26 @@ library(tidyverse)
 # Task 1: Conceptual Questions
 
 1. What is the purpose of the `lapply()` function? What is the equivalent `purrr` function?
-  - The purpose of `lapply()` is to easily apply a function to each element of a list. The equivalent `purrr` function is `map()`. 
+
+  > The purpose of `lapply()` is to easily apply a function to each element of a list. The equivalent `purrr` function is `map()`. 
+  
 2. Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use `lapply()` to run the code `cor(numeric_matrix, method = "kendall")` on each element of the list. Write code to do this below! 
-  - `lapply(X=my_list,FUN=cor,method="kendall")`
+
+  > `lapply(X=my_list,FUN=cor,method="kendall")`
+  
 3. What are two advantages of using `purrr` functions instead of the `BaseR` apply family?
-  1. There are several associated helper functions and some convenient shorthand functionality.
-  2. There is more consistency across `purrr` functions in terms of argument naming schemes, etc. 
+
+  > There are several associated helper functions and some convenient shorthand functionality.
+  
+  > There is more consistency across `purrr` functions in terms of argument naming schemes, etc. 
+  
 4. What is a side-effect function?
-  - A side-effect function is a function where the main purpose is not to modify objects in the environment, but rather to output other things like data files, text, and plots. Examples are `plot()` and `write_csv`. 
+
+  > A side-effect function is a function where the main purpose is not to modify objects in the environment, but rather to output other things like data files, text, and plots. Examples are `plot()` and `write_csv`. 
+  
 5. Why can you name a variable `sd` in a function and not cause any issues with the `sd` function?
- - Because `R` creates temporary function environment while the function is running, preventing any action within the function environment from overwriting anything outside that environment. The exception is, of course, the object assigned the function output. 
+
+  > Because `R` creates temporary function environment while the function is running, preventing any action within the function environment from overwriting anything outside that environment. The exception is, of course, the object assigned the function output. 
  
  
 # Task 2: Writing R Functions
@@ -137,6 +149,8 @@ As was the case for `getRMSE()`, when we include `na.rm=TRUE`, the function work
 ### 5.
 
 Let's build a wrapper function that calls either or both of our functions above. We will call this function `get_pred_stat`. By default, the function will return both the RMSE and MAE. 
+
+Note to grader: I include data validity checks in the individual `getRMSE` and `getMAE` functions, so it is not necessary to add those checks into the explicit code for the wrapper function. 
 
 ```{r}
 #Creating a wrapper function for getRMSE and getMAE
@@ -300,7 +314,7 @@ fits |>
   walk(hist,xlab="Residual")
 ```
 
-That wasn't too hard, but the title and x-axis label are not informative. 
+That wasn't too hard, but the titles and x-axis labels are not informative. 
 
 ### 5.
 
@@ -332,4 +346,4 @@ fits |>
   iwalk(\(x,idx) hist(x,main=paste0("Histogram of Residuals for ",idx),xlab="Residual"))
 ```
 
-It worked! Now we know which histogram corresponds to which fit. The distribution of residuals is generally symmetric, which is what we want to see. There is visual evidence of a slight right-skew for the second model, although that is not the case when we add regressors to the model (`fit2` only includes `Sepal.Width` as a regressor). Additionally, this slight asymmetry could be the product of the current bin width rather than actual asymmetry. 
+It worked! Now we know which histogram corresponds to which fit. The distribution of residuals is generally symmetric, which is what we want to see. There is visual evidence of a slight right-skew for the second model, although that is not the case when we add regressors to the model (`fit2` only includes `Sepal.Width` as a regressor). Additionally, this slight asymmetry could be the product of the current bin width and positions rather than actual asymmetry. 

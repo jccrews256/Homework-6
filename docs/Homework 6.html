@@ -140,6 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p>Before we get started, we need to read in the core <code>tidyverse</code> packages.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -178,30 +179,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>What is the purpose of the <code>lapply()</code> function? What is the equivalent <code>purrr</code> function?</li>
 </ol>
-<ul>
-<li>The purpose of <code>lapply()</code> is to easily apply a function to each element of a list. The equivalent <code>purrr</code> function is <code>map()</code>.</li>
-</ul>
+<blockquote class="blockquote">
+<p>The purpose of <code>lapply()</code> is to easily apply a function to each element of a list. The equivalent <code>purrr</code> function is <code>map()</code>.</p>
+</blockquote>
 <ol start="2" type="1">
 <li>Suppose we have a list called my_list. Each element of the list is a numeric data frame (all columns are numeric). We want use <code>lapply()</code> to run the code <code>cor(numeric_matrix, method = "kendall")</code> on each element of the list. Write code to do this below!</li>
 </ol>
-<ul>
-<li><code>lapply(X=my_list,FUN=cor,method="kendall")</code></li>
-</ul>
+<blockquote class="blockquote">
+<p><code>lapply(X=my_list,FUN=cor,method="kendall")</code></p>
+</blockquote>
 <ol start="3" type="1">
 <li>What are two advantages of using <code>purrr</code> functions instead of the <code>BaseR</code> apply family?</li>
-<li>There are several associated helper functions and some convenient shorthand functionality.</li>
-<li>There is more consistency across <code>purrr</code> functions in terms of argument naming schemes, etc.</li>
+</ol>
+<blockquote class="blockquote">
+<p>There are several associated helper functions and some convenient shorthand functionality.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>There is more consistency across <code>purrr</code> functions in terms of argument naming schemes, etc.</p>
+</blockquote>
+<ol start="4" type="1">
 <li>What is a side-effect function?</li>
 </ol>
-<ul>
-<li>A side-effect function is a function where the main purpose is not to modify objects in the environment, but rather to output other things like data files, text, and plots. Examples are <code>plot()</code> and <code>write_csv</code>.</li>
-</ul>
+<blockquote class="blockquote">
+<p>A side-effect function is a function where the main purpose is not to modify objects in the environment, but rather to output other things like data files, text, and plots. Examples are <code>plot()</code> and <code>write_csv</code>.</p>
+</blockquote>
 <ol start="5" type="1">
 <li>Why can you name a variable <code>sd</code> in a function and not cause any issues with the <code>sd</code> function?</li>
 </ol>
-<ul>
-<li>Because <code>R</code> creates temporary function environment while the function is running, preventing any action within the function environment from overwriting anything outside that environment. The exception is, of course, the object assigned the function output.</li>
-</ul>
+<blockquote class="blockquote">
+<p>Because <code>R</code> creates temporary function environment while the function is running, preventing any action within the function environment from overwriting anything outside that environment. The exception is, of course, the object assigned the function output.</p>
+</blockquote>
 </section>
 <section id="task-2-writing-r-functions" class="level1">
 <h1>Task 2: Writing R Functions</h1>
@@ -320,6 +327,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="section-4" class="level3">
 <h3 class="anchored" data-anchor-id="section-4">5.</h3>
 <p>Let’s build a wrapper function that calls either or both of our functions above. We will call this function <code>get_pred_stat</code>. By default, the function will return both the RMSE and MAE.</p>
+<p>Note to grader: I include data validity checks in the individual <code>getRMSE</code> and <code>getMAE</code> functions, so it is not necessary to add those checks into the explicit code for the wrapper function.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Creating a wrapper function for getRMSE and getMAE</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>get_pred_stats<span class="ot">&lt;-</span><span class="cf">function</span>(resp,pred,<span class="at">stats=</span><span class="fu">c</span>(<span class="st">"RMSE"</span>,<span class="st">"MAE"</span>),...) {</span>
@@ -558,7 +566,7 @@ Speciesvirginica  -1.6831329 -0.36386273</code></pre>
 </div>
 </div>
 </div>
-<p>That wasn’t too hard, but the title and x-axis label are not informative.</p>
+<p>That wasn’t too hard, but the titles and x-axis labels are not informative.</p>
 </section>
 <section id="section-9" class="level3">
 <h3 class="anchored" data-anchor-id="section-9">5.</h3>
@@ -599,7 +607,7 @@ Speciesvirginica  -1.6831329 -0.36386273</code></pre>
 </div>
 </div>
 </div>
-<p>It worked! Now we know which histogram corresponds to which fit. The distribution of residuals is generally symmetric, which is what we want to see. There is visual evidence of a slight right-skew for the second model, although that is not the case when we add regressors to the model (<code>fit2</code> only includes <code>Sepal.Width</code> as a regressor). Additionally, this slight asymmetry could be the product of the current bin width rather than actual asymmetry.</p>
+<p>It worked! Now we know which histogram corresponds to which fit. The distribution of residuals is generally symmetric, which is what we want to see. There is visual evidence of a slight right-skew for the second model, although that is not the case when we add regressors to the model (<code>fit2</code> only includes <code>Sepal.Width</code> as a regressor). Additionally, this slight asymmetry could be the product of the current bin width and positions rather than actual asymmetry.</p>
 
 
 </section>

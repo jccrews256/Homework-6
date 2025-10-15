@@ -314,7 +314,7 @@ fits |>
   walk(hist,xlab="Residual")
 ```
 
-That wasn't too hard, but the titles labels are not informative. 
+That wasn't too hard, but the titles are not informative. 
 
 ### 5.
 

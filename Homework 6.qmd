@@ -203,6 +203,8 @@ As was the case for our individual `getRMSE` and `getMAE` functions when we spec
 As a final set of checks, we will test the function when incorrect data are specified. First, let's feed a character vector for `pred`. 
 
 ```{r}
+#| error: true
+
 #Testing the function with a character vector passed for pred
 get_pred_stats(resp=resp,pred=as.character(pred))
 ```
@@ -212,6 +214,8 @@ This is exactly what we wanted to happen; the function returns an error and info
 Now, let's feed a data frame for `resp` and see what the function returns. 
 
 ```{r}
+#| error: true
+
 #Testing the function with a data frame passed for resp
 get_pred_stats(resp=data.frame(resp,resp),pred=pred)
 ```
@@ -281,3 +285,51 @@ fits |>
 ```
 
 Again, that was incredibly easy, and now we can identify the coefficients in each model that are statistically different from 0. 
+
+
+### 4.
+Let's plot the residuals for each fit to visualize in-sample prediction error. To start, we will utilize the `map` function to capture the residuals for each fit and the `walk` function to generate a histogram for each fit. 
+
+```{r}
+#Specifying a 2x2 grid of histograms
+par(mfrow = c(2, 2))
+
+#Extracting residuals and creating histograms
+fits |>
+  map(resid) |>
+  walk(hist,xlab="Residual")
+```
+
+That wasn't too hard, but the title and x-axis label are not informative. 
+
+### 5.
+
+Let's give names to the elements of the residuals list to see if that fixes the issue. 
+
+```{r}
+#Specifying a 2x2 grid of histograms
+par(mfrow = c(2, 2))
+
+#Extracting residuals, naming list elements, and creating histograms
+fits |>
+  map(resid) |>
+  set_names(c("fit1","fit2","fit3","fit4")) |>
+  walk(hist,xlab="Residual")
+```
+
+No luck, as there is no clear way to pass the names to the `hist` function. 
+
+It seems we need to use the `walk` variant `iwalk` to gain access to the element names. Let's combine `iwalk` with an anonymous function that indicates we want to run the `hist` function for each set of residuals and specify a title that incorporates the element names. 
+
+```{r}
+#Specifying a 2x2 grid of histograms
+par(mfrow = c(2, 2))
+
+#Extracting residuals, naming list elements, and creating histograms with names incorporated in titles
+fits |>
+  map(resid) |>
+  set_names(c("fit1","fit2","fit3","fit4")) |>
+  iwalk(\(x,idx) hist(x,main=paste0("Histogram of Residuals for ",idx),xlab="Residual"))
+```
+
+It worked! Now we know which histogram corresponds to which fit. The distribution of residuals is generally symmetric, which is what we want to see. There is visual evidence of a slight right-skew for the second model, although that is not the case when we add regressors to the model (`fit2` only includes `Sepal.Width` as a regressor). Additionally, this slight asymmetry could be the product of the current bin width rather than actual asymmetry. 
